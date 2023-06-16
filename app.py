@@ -612,7 +612,7 @@ DESCRIPTION = '''
 ### This space provides the function of key frame translation. Full code for full video translation will be released upon the publication of the paper.
 ### To avoid overload, we set limitations to the maximum frame number and the maximum frame resolution.
 ### Tips: 
-1. This method cannot handle large or quick motions where the optical flow is hard to estimate. Videos with stable motions are prefered.
+1. This method cannot handle large or quick motions where the optical flow is hard to estimate. Videos with stable motions are preferred.
 2. Pixel-aware fusion may not work for large or quick motions.
 3. revAnimated_v11 model for non-photorealstic style, realisticVisionV20_v20 model for photorealstic style.
 4. To use your own SD/LoRA model, you may clone the space and speficify your model with [sd_model_cfg.py](https://huggingface.co/spaces/Anonymous-sub/Rerender/blob/main/sd_model_cfg.py).
@@ -912,7 +912,7 @@ with block:
     run_button2.click(fn=process2, inputs=ips, outputs=[result_keyframe])
 
     def process3():
-        raise gr.Error("Coming Soon. Full code will be "
+        raise gr.Error("Coming Soon. Full code for full video translation will be "
                        "released upon the publication of the paper.")
 
     run_button3.click(fn=process3, outputs=[result_keyframe])
