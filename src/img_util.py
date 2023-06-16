@@ -2,6 +2,8 @@ import einops
 import torch
 import torch.nn.functional as F
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 @torch.no_grad()
 def find_flat_region(mask):
@@ -18,6 +20,6 @@ def find_flat_region(mask):
 
 
 def numpy2tensor(img):
-    x0 = torch.from_numpy(img.copy()).float().cuda() / 255.0 * 2.0 - 1.
+    x0 = torch.from_numpy(img.copy()).float().to(device) / 255.0 * 2.0 - 1.
     x0 = torch.stack([x0], dim=0)
     return einops.rearrange(x0, 'b h w c -> b c h w').clone()
