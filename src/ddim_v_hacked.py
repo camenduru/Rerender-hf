@@ -14,6 +14,8 @@ from ControlNet.ldm.modules.diffusionmodules.util import (
 
 _ATTN_PRECISION = os.environ.get('ATTN_PRECISION', 'fp32')
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 def register_attention_control(model, controller=None):
 
@@ -36,7 +38,7 @@ def register_attention_control(model, controller=None):
 
             # force cast to fp32 to avoid overflowing
             if _ATTN_PRECISION == 'fp32':
-                with torch.autocast(enabled=False, device_type='cuda'):
+                with torch.autocast(enabled=False, device_type=device):
                     q, k = q.float(), k.float()
                     sim = torch.einsum('b i d, b j d -> b i j', q,
                                        k) * self.scale
@@ -98,8 +100,8 @@ class DDIMVSampler(object):
 
     def register_buffer(self, name, attr):
         if type(attr) == torch.Tensor:
-            if attr.device != torch.device('cuda'):
-                attr = attr.to(torch.device('cuda'))
+            if attr.device != torch.device(device):
+                attr = attr.to(torch.device(device))
         setattr(self, name, attr)
 
     def make_schedule(self,

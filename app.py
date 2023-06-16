@@ -303,6 +303,8 @@ def process1(*args):
     imgs = sorted(os.listdir(cfg.input_dir))
     imgs = [os.path.join(cfg.input_dir, img) for img in imgs]
 
+    model.cond_stage_model.device = device
+
     with torch.no_grad():
         frame = cv2.imread(imgs[0])
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -607,6 +609,7 @@ def process2(*args):
 
     return key_video_path
 
+
 DESCRIPTION = '''
 ## Rerender A Video
 ### This space provides the function of key frame translation. Full code for full video translation will be released upon the publication of the paper.
@@ -644,12 +647,13 @@ with block:
                 run_button3 = gr.Button(value='Run Propagation')
             with gr.Accordion('Advanced options for the 1st frame translation',
                               open=False):
-                image_resolution = gr.Slider(label='Frame rsolution',
-                                             minimum=256,
-                                             maximum=512,
-                                             value=512,
-                                             step=64,
-                                             info='To avoid overload, maximum 512')
+                image_resolution = gr.Slider(
+                    label='Frame rsolution',
+                    minimum=256,
+                    maximum=512,
+                    value=512,
+                    step=64,
+                    info='To avoid overload, maximum 512')
                 control_strength = gr.Slider(label='ControNet strength',
                                              minimum=0.0,
                                              maximum=2.0,
@@ -734,12 +738,13 @@ with block:
                     value=1,
                     step=1,
                     info='Uniformly sample the key frames every K frames')
-                keyframe_count = gr.Slider(label='Number of key frames',
-                                           minimum=1,
-                                           maximum=1,
-                                           value=1,
-                                           step=1,
-                                           info='To avoid overload, maximum 8 key frames')
+                keyframe_count = gr.Slider(
+                    label='Number of key frames',
+                    minimum=1,
+                    maximum=1,
+                    value=1,
+                    step=1,
+                    info='To avoid overload, maximum 8 key frames')
 
                 use_constraints = gr.CheckboxGroup(
                     [
@@ -769,8 +774,10 @@ with block:
                     maximum=100,
                     value=1,
                     step=1,
-                    info=('Update the key and value for '
-                          'cross-frame attention every N key frames (recommend N*K>=10)'))
+                    info=
+                    ('Update the key and value for '
+                     'cross-frame attention every N key frames (recommend N*K>=10)'
+                     ))
                 with gr.Row():
                     warp_start = gr.Slider(label='Shape-aware fusion start',
                                            minimum=0,
@@ -912,8 +919,9 @@ with block:
     run_button2.click(fn=process2, inputs=ips, outputs=[result_keyframe])
 
     def process3():
-        raise gr.Error("Coming Soon. Full code for full video translation will be "
-                       "released upon the publication of the paper.")
+        raise gr.Error(
+            "Coming Soon. Full code for full video translation will be "
+            "released upon the publication of the paper.")
 
     run_button3.click(fn=process3, outputs=[result_keyframe])
 
