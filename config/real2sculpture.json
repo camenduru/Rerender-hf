@@ -4,7 +4,7 @@
     "work_dir": "videos/pexels-cottonbro-studio-6649832-960x506-25fps",
     "key_subdir": "keys",
     "sd_model": "models/realisticVisionV20_v20.safetensors",
-    "frame_count": 82,
+    "frame_count": 62,
     "interval": 10,
     "crop": [
         0,
