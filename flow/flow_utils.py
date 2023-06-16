@@ -12,6 +12,8 @@ sys.path.insert(0, gmflow_dir)
 from gmflow.gmflow import GMFlow  # noqa: E702 E402 F401
 from utils.utils import InputPadder  # noqa: E702 E402
 
+global_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 def coords_grid(b, h, w, homogeneous=False, device=None):
     y, x = torch.meshgrid(torch.arange(h), torch.arange(w))  # [H, W]
@@ -27,7 +29,7 @@ def coords_grid(b, h, w, homogeneous=False, device=None):
     grid = grid[None].repeat(b, 1, 1, 1)  # [B, 2, H, W] or [B, 3, H, W]
 
     if device is not None:
-        grid = grid.to(device)
+        grid = grid.to(global_device)
 
     return grid
 
@@ -117,7 +119,8 @@ def get_warped_and_mask(flow_model,
     if image3 is None:
         image3 = image1
     padder = InputPadder(image1.shape, padding_factor=8)
-    image1, image2 = padder.pad(image1[None].cuda(), image2[None].cuda())
+    image1, image2 = padder.pad(image1[None].to(global_device),
+                                image2[None].to(global_device))
     results_dict = flow_model(image1,
                               image2,
                               attn_splits_list=[2],
@@ -150,8 +153,7 @@ class FlowCalc():
             attention_type='swin',
             ffn_dim_expansion=4,
             num_transformer_layers=6,
-        ).to('cuda')
-
+        ).to(global_device)
         checkpoint = torch.load(model_path,
                                 map_location=lambda storage, loc: storage)
         weights = checkpoint['model'] if 'model' in checkpoint else checkpoint
@@ -168,7 +170,8 @@ class FlowCalc():
         image1 = torch.from_numpy(image1).permute(2, 0, 1).float()
         image2 = torch.from_numpy(image2).permute(2, 0, 1).float()
         padder = InputPadder(image1.shape, padding_factor=8)
-        image1, image2 = padder.pad(image1[None].cuda(), image2[None].cuda())
+        image1, image2 = padder.pad(image1[None].to(global_device),
+                                    image2[None].to(global_device))
         results_dict = self.model(image1,
                                   image2,
                                   attn_splits_list=[2],
