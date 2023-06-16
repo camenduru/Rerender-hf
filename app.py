@@ -275,6 +275,13 @@ def process(*args):
 
 
 @torch.no_grad()
+def process0(*args):
+    global global_video_path
+    global_video_path = args[0]
+    return process(*args[1:])
+
+
+@torch.no_grad()
 def process1(*args):
 
     global global_video_path
@@ -853,10 +860,6 @@ with block:
                     inner_strength, smooth_boundary
                 ]
 
-                gr.Examples(examples=args_list,
-                            inputs=[input_path, *ips],
-                            cache_examples=True)
-
         with gr.Column():
             result_image = gr.Image(label='Output first frame',
                                     type='numpy',
@@ -864,6 +867,12 @@ with block:
             result_keyframe = gr.Video(label='Output key frame video',
                                        format='mp4',
                                        interactive=False)
+    with gr.Row():
+        gr.Examples(examples=args_list,
+                    inputs=[input_path, *ips],
+                    fn=process0,
+                    outputs=[result_image, result_keyframe],
+                    cache_examples=True)
 
     def input_uploaded(path):
         frame_count = get_frame_count(path)
