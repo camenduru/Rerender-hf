@@ -296,6 +296,7 @@ def process1(*args):
     detector = global_state.detector
     controller = global_state.controller
     model.control_scales = [cfg.control_strength] * 13
+    model.to(device)
 
     num_samples = 1
     eta = 0.0
