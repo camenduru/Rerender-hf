@@ -613,7 +613,8 @@ def process2(*args):
 DESCRIPTION = '''
 ## Rerender A Video
 ### This space provides the function of key frame translation. Full code for full video translation will be released upon the publication of the paper.
-### To avoid overload, we set limitations to the maximum frame number and the maximum frame resolution.
+### To avoid overload, we set limitations to the maximum frame number (8) and the maximum frame resolution (512x768). 
+### The running time of a video of size 512x640 is about 1 minute per keyframe under T4 GPU.
 ### Tips: 
 1. This method cannot handle large or quick motions where the optical flow is hard to estimate. **Videos with stable motions are preferred**.
 2. Pixel-aware fusion may not work for large or quick motions.
@@ -852,10 +853,9 @@ with block:
                     inner_strength, smooth_boundary
                 ]
 
-                gr.Examples(
-                    examples=args_list,
-                    inputs=[input_path, *ips],
-                )
+                gr.Examples(examples=args_list,
+                            inputs=[input_path, *ips],
+                            cache_examples=True)
 
         with gr.Column():
             result_image = gr.Image(label='Output first frame',

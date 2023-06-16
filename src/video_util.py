@@ -74,7 +74,7 @@ def resize_image(input_image, resolution):
     H, W, C = input_image.shape
     H = float(H)
     W = float(W)
-    k = float(resolution) / min(H, W)
+    k = min(float(resolution) / min(H, W), float(768) / max(H, W))
     H *= k
     W *= k
     H = int(np.round(H / 64.0)) * 64
