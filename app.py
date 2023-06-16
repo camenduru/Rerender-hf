@@ -30,12 +30,29 @@ from src.img_util import find_flat_region, numpy2tensor
 from src.video_util import (frame_to_video, get_fps, get_frame_count,
                             prepare_frames)
 
+import huggingface_hub
+
+repo_name = 'Anonymous-sub/Rerender'
+
+huggingface_hub.hf_hub_download(repo_name,
+                                'pexels-koolshooters-7322716.mp4',
+                                local_dir='videos')
+huggingface_hub.hf_hub_download(
+    repo_name,
+    'pexels-antoni-shkraba-8048492-540x960-25fps.mp4',
+    local_dir='videos')
+huggingface_hub.hf_hub_download(
+    repo_name,
+    'pexels-cottonbro-studio-6649832-960x506-25fps.mp4',
+    local_dir='videos')
+
 inversed_model_dict = dict()
 for k, v in model_dict.items():
     inversed_model_dict[v] = k
 
 to_tensor = T.PILToTensor()
 blur = T.GaussianBlur(kernel_size=(9, 9), sigma=(18, 18))
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 class ProcessingState(Enum):
@@ -64,7 +81,7 @@ class GlobalState:
             attention_type='swin',
             ffn_dim_expansion=4,
             num_transformer_layers=6,
-        ).to('cuda')
+        ).to(device)
 
         checkpoint = torch.load('models/gmflow_sintel-0c07dcb3.pth',
                                 map_location=lambda storage, loc: storage)
@@ -86,25 +103,32 @@ class GlobalState:
         model = create_model('./ControlNet/models/cldm_v15.yaml').cpu()
         if control_type == 'HED':
             model.load_state_dict(
-                load_state_dict('./models/control_sd15_hed.pth',
-                                location='cuda'))
+                load_state_dict(huggingface_hub.hf_hub_download(
+                    'lllyasviel/ControlNet', './models/control_sd15_hed.pth'),
+                                location=device))
         elif control_type == 'canny':
             model.load_state_dict(
-                load_state_dict('./models/control_sd15_canny.pth',
-                                location='cuda'))
-        model = model.cuda()
+                load_state_dict(huggingface_hub.hf_hub_download(
+                    'lllyasviel/ControlNet', 'models/control_sd15_canny.pth'),
+                                location=device))
+        model.to(device)
         sd_model_path = model_dict[sd_model]
         if len(sd_model_path) > 0:
             model_ext = os.path.splitext(sd_model_path)[1]
+            downloaded_model = huggingface_hub.hf_hub_download(
+                repo_name, sd_model_path)
             if model_ext == '.safetensors':
-                model.load_state_dict(load_file(sd_model_path), strict=False)
-            elif model_ext == '.ckpt' or model_ext == '.pth':
-                model.load_state_dict(torch.load(sd_model_path)['state_dict'],
+                model.load_state_dict(load_file(downloaded_model),
                                       strict=False)
+            elif model_ext == '.ckpt' or model_ext == '.pth':
+                model.load_state_dict(
+                    torch.load(downloaded_model)['state_dict'], strict=False)
 
         try:
             model.first_stage_model.load_state_dict(torch.load(
-                './models/vae-ft-mse-840000-ema-pruned.ckpt')['state_dict'],
+                huggingface_hub.hf_hub_download(
+                    'stabilityai/sd-vae-ft-mse-original',
+                    'vae-ft-mse-840000-ema-pruned.ckpt'))['state_dict'],
                                                     strict=False)
         except Exception:
             print('Warning: We suggest you download the fine-tuned VAE',
@@ -115,7 +139,8 @@ class GlobalState:
     def clear_sd_model(self):
         self.sd_model = None
         self.ddim_v_sampler = None
-        torch.cuda.empty_cache()
+        if device == 'cuda':
+            torch.cuda.empty_cache()
 
     def update_detector(self, control_type, canny_low=100, canny_high=200):
         if self.detector_type == control_type:
@@ -286,14 +311,14 @@ def process1(*args):
         img_ = numpy2tensor(img)
 
         def generate_first_img(img_, strength):
-            encoder_posterior = model.encode_first_stage(img_.cuda())
+            encoder_posterior = model.encode_first_stage(img_.to(device))
             x0 = model.get_first_stage_encoding(encoder_posterior).detach()
 
             detected_map = detector(img)
             detected_map = HWC3(detected_map)
 
             control = torch.from_numpy(
-                detected_map.copy()).float().cuda() / 255.0
+                detected_map.copy()).float().to(device) / 255.0
             control = torch.stack([control for _ in range(num_samples)], dim=0)
             control = einops.rearrange(control, 'b h w c -> b c h w').clone()
             cond = {
@@ -411,13 +436,14 @@ def process2(*args):
             img_ = apply_color_correction(global_state.color_corrections,
                                           Image.fromarray(img))
             img_ = to_tensor(img_).unsqueeze(0)[:, :3] / 127.5 - 1
-        encoder_posterior = model.encode_first_stage(img_.cuda())
+        encoder_posterior = model.encode_first_stage(img_.to(device))
         x0 = model.get_first_stage_encoding(encoder_posterior).detach()
 
         detected_map = detector(img)
         detected_map = HWC3(detected_map)
 
-        control = torch.from_numpy(detected_map.copy()).float().cuda() / 255.0
+        control = torch.from_numpy(
+            detected_map.copy()).float().to(device) / 255.0
         control = torch.stack([control for _ in range(num_samples)], dim=0)
         control = einops.rearrange(control, 'b h w c -> b c h w').clone()
         cond = {
