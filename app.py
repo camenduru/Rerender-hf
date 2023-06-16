@@ -607,11 +607,23 @@ def process2(*args):
 
     return key_video_path
 
+DESCRIPTION = '''
+## Rerender A Video
+### This space provides the function of key frame translation. Full code for full video translation will be released upon the publication of the paper.
+### To avoid overload, we set limitations to the maximum frame number and the maximum frame resolution.
+### Tips: 
+1. This method cannot handle large or quick motions where the optical flow is hard to estimate. Videos with stable motions are prefered.
+2. Pixel-aware fusion may not work for large or quick motions.
+3. revAnimated_v11 model for non-photorealstic style, realisticVisionV20_v20 model for photorealstic style.
+4. To use your own SD/LoRA model, you may clone the space and speficify your model with [sd_model_cfg.py](https://huggingface.co/spaces/Anonymous-sub/Rerender/blob/main/sd_model_cfg.py).
+5. This method is based on the original SD model. You may need to [convert](https://github.com/huggingface/diffusers/blob/main/scripts/convert_diffusers_to_original_stable_diffusion.py) Diffuser/Automatic1111 models to the original one. 
+6. Try different color-aware AdaIN settings and even unuse it to avoid color jittering.
+'''
 
 block = gr.Blocks().queue()
 with block:
     with gr.Row():
-        gr.Markdown('## Rerender A Video')
+        gr.Markdown(DESCRIPTION)
     with gr.Row():
         with gr.Column():
             input_path = gr.Video(label='Input Video',
@@ -636,7 +648,8 @@ with block:
                                              minimum=256,
                                              maximum=512,
                                              value=512,
-                                             step=64)
+                                             step=64,
+                                             info='To avoid overload, maximum 512')
                 control_strength = gr.Slider(label='ControNet strength',
                                              minimum=0.0,
                                              maximum=2.0,
@@ -692,9 +705,10 @@ with block:
                                                step=1)
                 ddim_steps = gr.Slider(label='Steps',
                                        minimum=1,
-                                       maximum=100,
+                                       maximum=20,
                                        value=20,
-                                       step=1)
+                                       step=1,
+                                       info='To avoid overload, maximum 20')
                 scale = gr.Slider(label='CFG scale',
                                   minimum=0.1,
                                   maximum=30.0,
@@ -724,7 +738,8 @@ with block:
                                            minimum=1,
                                            maximum=1,
                                            value=1,
-                                           step=1)
+                                           step=1,
+                                           info='To avoid overload, maximum 8 key frames')
 
                 use_constraints = gr.CheckboxGroup(
                     [
@@ -755,7 +770,7 @@ with block:
                     value=1,
                     step=1,
                     info=('Update the key and value for '
-                          'cross-frame attention every N key frames'))
+                          'cross-frame attention every N key frames (recommend N*K>=10)'))
                 with gr.Row():
                     warp_start = gr.Slider(label='Shape-aware fusion start',
                                            minimum=0,
