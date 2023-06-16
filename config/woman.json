@@ -3,7 +3,7 @@
     "output": "videos/pexels-koolshooters-7322716/blend.mp4",
     "work_dir": "videos/pexels-koolshooters-7322716",
     "key_subdir": "keys",
-    "frame_count": 82,
+    "frame_count": 62,
     "interval": 10,
     "sd_model": "models/revAnimated_v11.safetensors",
     "prompt": "a beautiful woman in CG style",
