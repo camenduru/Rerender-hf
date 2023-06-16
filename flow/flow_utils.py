@@ -18,7 +18,7 @@ repo_name = 'Anonymous-sub/Rerender'
 
 global_device = 'cuda' if torch.cuda.is_available() else 'cpu'
 gmflow_path = huggingface_hub.hf_hub_download(
-    repo_name, 'models/gmflow_sintel-0c07dcb3.pth', local_dir='models')
+    repo_name, 'models/gmflow_sintel-0c07dcb3.pth', local_dir='./')
 
 
 def coords_grid(b, h, w, homogeneous=False, device=None):
