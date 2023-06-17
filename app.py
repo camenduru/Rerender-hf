@@ -629,9 +629,6 @@ DESCRIPTION = '''
 4. `revAnimated_v11` model for non-photorealstic style, `realisticVisionV20_v20` model for photorealstic style.
 5. To use your own SD/LoRA model, you may clone the space and specify your model with [sd_model_cfg.py](https://huggingface.co/spaces/Anonymous-sub/Rerender/blob/main/sd_model_cfg.py).
 6. This method is based on the original SD model. You may need to [convert](https://github.com/huggingface/diffusers/blob/main/scripts/convert_diffusers_to_original_stable_diffusion.py) Diffuser/Automatic1111 models to the original one. 
-
-<a href="https://huggingface.co/spaces/Anonymous-sub/Rerender?duplicate=true" style="display: inline-block;margin-top: .5em;margin-right: .25em;" target="_blank">
-<img style="margin-bottom: 0em;display: inline;margin-top: -.25em;" src="https://bit.ly/3gLdBN6" alt="Duplicate Space"></a> for no queue on your own hardware.</p>
 '''
 
 block = gr.Blocks().queue()
