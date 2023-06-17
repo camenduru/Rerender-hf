@@ -622,6 +622,13 @@ DESCRIPTION = '''
 ### This space provides the function of key frame translation. Full code for full video translation will be released upon the publication of the paper.
 ### To avoid overload, we set limitations to the maximum frame number (8) and the maximum frame resolution (512x768). 
 ### The running time of a video of size 512x640 is about 1 minute per keyframe under T4 GPU.
+
+### How to use:
+1. **Run 1st Key Frame**: only translate the first frame, so you can adjust the prompts/models/parameters to find your ideal output appearance before run the whole video.
+2. **Run Key Frames**: translate all the key frames based on the settings of the first frame
+3. **Run All**: **Run 1st Key Frame** and **Run Key Frames**
+4. **Run Propagation**: propogate the key frames to other frames for full video translation. This part will be released upon the publication of the paper.
+
 ### Tips: 
 1. This method cannot handle large or quick motions where the optical flow is hard to estimate. **Videos with stable motions are preferred**.
 2. Pixel-aware fusion may not work for large or quick motions.
@@ -629,6 +636,8 @@ DESCRIPTION = '''
 4. `revAnimated_v11` model for non-photorealstic style, `realisticVisionV20_v20` model for photorealstic style.
 5. To use your own SD/LoRA model, you may clone the space and specify your model with [sd_model_cfg.py](https://huggingface.co/spaces/Anonymous-sub/Rerender/blob/main/sd_model_cfg.py).
 6. This method is based on the original SD model. You may need to [convert](https://github.com/huggingface/diffusers/blob/main/scripts/convert_diffusers_to_original_stable_diffusion.py) Diffuser/Automatic1111 models to the original one. 
+
+**This code is for research purpose and non-commercial use only.**
 '''
 
 block = gr.Blocks().queue()
