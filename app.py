@@ -620,7 +620,7 @@ def process2(*args):
 DESCRIPTION = '''
 ## Rerender A Video
 ### This space provides the function of key frame translation. Full code for full video translation will be released upon the publication of the paper.
-### To avoid overload, we set limitations to the maximum frame number (8) and the maximum frame resolution (512x768). 
+### To avoid overload, we set limitations to the **maximum frame number** (8) and the maximum frame resolution (512x768).
 ### The running time of a video of size 512x640 is about 1 minute per keyframe under T4 GPU.
 
 ### How to use:
@@ -898,7 +898,7 @@ with block:
         global_video_path = path
 
         return gr.Slider.update(value=default_interval,
-                                maximum=MAX_KEYFRAME), gr.Slider.update(
+                                maximum=frame_count - 2), gr.Slider.update(
                                     value=max_keyframe, maximum=max_keyframe)
 
     def input_changed(path):
@@ -914,7 +914,7 @@ with block:
         global global_video_path
         global_video_path = path
 
-        return gr.Slider.update(maximum=max_keyframe), \
+        return gr.Slider.update(value=default_interval,
             gr.Slider.update(maximum=max_keyframe)
 
     def interval_changed(interval):
@@ -922,7 +922,7 @@ with block:
         if video_frame_count is None:
             return gr.Slider.update()
 
-        max_keyframe = (video_frame_count - 2) // interval
+        max_keyframe = min((video_frame_count - 2) // interval, MAX_KEYFRAME)
 
         return gr.Slider.update(value=max_keyframe, maximum=max_keyframe)
 
