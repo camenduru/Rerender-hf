@@ -922,7 +922,7 @@ with block:
         if video_frame_count is None:
             return gr.Slider.update()
 
-        max_keyframe = min((video_frame_count - 2) // interval, MAX_KEYFRAME)
+        max_keyframe = min(video_frame_count - 2) // interval, MAX_KEYFRAME)
 
         return gr.Slider.update(value=max_keyframe, maximum=max_keyframe)
 
