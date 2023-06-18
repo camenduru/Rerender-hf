@@ -915,6 +915,7 @@ with block:
         global_video_path = path
 
         return gr.Slider.update(value=default_interval,
+                                maximum=frame_count - 2), \
             gr.Slider.update(maximum=max_keyframe)
 
     def interval_changed(interval):
@@ -924,7 +925,7 @@ with block:
 
         max_keyframe = min((video_frame_count - 2) // interval, MAX_KEYFRAME)
 
-        return gr.Slider.update(value=max_keyframe, maximum=max_keyframe)e)
+        return gr.Slider.update(value=max_keyframe, maximum=max_keyframe)
 
     input_path.change(input_changed, input_path, [interval, keyframe_count])
     input_path.upload(input_uploaded, input_path, [interval, keyframe_count])
