@@ -61,7 +61,7 @@ class ProcessingState(Enum):
     KEY_IMGS = 2
 
 
-MAX_KEYFRAME = 8
+MAX_KEYFRAME = 300
 
 
 class GlobalState:
